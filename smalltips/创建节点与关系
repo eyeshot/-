@@ -1,0 +1,27 @@
+py2neo库创建节点与关系的时候，节点是人名，关系是具体关系，但是遇到了节点和关系不在同一个表格中的情况，怎么办呢？
+        for node_name in nodes:
+            node = Node(label, name=node_name)
+            self.graph.create(node)
+        return
+    在这种情况下，再想添加关系，显然找不到node类型，无法在原来已经创建好的node上找到node添加关系
+    想到这种情况可以做一个字典，把对应的字符串和node结构加入字典，根据node的名称查询到node，进而建立关系
+    代码如下：
+all_node = {}
+for node_name in person_names:
+    node = Node('person_name', name=node_name)
+    graph.create(node)
+    all_node[node_name]=node
+    
+for i in range(len(df2.index)):
+    if name1[i] not in all_node:
+        node = Node('person_name',name = name1[i])
+        graph.create(node)
+        all_node[name1[i]]=node
+    if name2[i] not in all_node:
+        node = Node('person_name',name = name2[i])
+        graph.create(node)
+        all_node[name2[i]]=node
+    rel = Relationship(all_node[name1[i]],relationship[i],all_node[name2[i]])
+    print(rel)
+    graph.create(rel)
+    利用小技巧将不同表中的关系和节点创建，其实也可以先合并表格
